@@ -22,14 +22,50 @@ dependencies {
     // With compose.desktop.common you will also lose @Preview functionality
     implementation(compose.desktop.currentOs)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    //viewmodel
     implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
+
+    //navigation
+    //implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
+    val voyagerVersion = "1.1.0-beta02"
+
+    // Multiplatform
+
+    // Navigator
+    implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
+
+    // Screen Model
+    implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVersion")
+
+    // BottomSheetNavigator
+    implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVersion")
+
+    // TabNavigator
+    implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVersion")
+
+    // Transitions
+    implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
+
+    // Koin integration
+    implementation("cafe.adriel.voyager:voyager-koin:$voyagerVersion")
+
+    // Android
+
+
+
+    // Desktop + Android
+
+    // Kodein integration
+    implementation("cafe.adriel.voyager:voyager-kodein:$voyagerVersion")
+
+    // RxJava integration
 
 }
 
 compose.desktop {
     application {
         mainClass = "MainKt"
-        jvmArgs += listOf("-Djava.library.path=/home/shahriyor/IdeaProjects/term_project_demo/c_code")
+        //jvmArgs += listOf("-Djava.library.path=/home/shahriyor/IdeaProjects/term_project_demo/c_code")
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "term_project_demo"
