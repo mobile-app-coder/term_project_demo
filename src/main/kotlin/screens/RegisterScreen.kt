@@ -17,7 +17,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import view_models.RegisterViewModel
+import viewmodels.RegisterViewModel
 
 
 class RegisterScreen : Screen {

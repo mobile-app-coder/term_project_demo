@@ -1,187 +1,457 @@
 package screens
 
-
-
+import androidx.compose.animation.*
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import viewmodels.HomeScreenViewModel
+import java.time.LocalDate
+import java.util.Calendar
+import java.util.Date
 
+// Main HomeScreen with a permanent sidebar
 class HomeScreen : Screen {
-
     @Composable
     @Preview
     override fun Content() {
-        // Custom colors
-        val backgroundColor = Color(0xFFECEFF1) // Light grey for the scaffold background
-        val buttonColor = Color(0xFF546E7A) // Dark blue-grey for buttons
-        val cardBackgroundColor = Color(0xFF607D8B) // Color for the cards
+        MaterialTheme {
+            // Create a Navigator
+            Navigator(DashboardScreen()) { navigator ->
+                Row(Modifier.fillMaxSize()) {
+                    // Sidebar is static and always visible
+                    Sidebar(navigator)
 
-        Scaffold(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(all = 20.dp)
-                .background(backgroundColor)
-        ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-
-                // Header with name and balance
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Column {
-                        Text(text = "Turayev Shahriyor", fontSize = 20.sp)
-                        Spacer(Modifier.height(10.dp))
-                        Text("$1 000 000", fontSize = 30.sp)
-                    }
-                    Spacer(Modifier.weight(1f))
-
-                    // Profile or other action icon (e.g., a Circle for profile pic)
+                    // Main content area changes based on the Navigator's current screen
                     Box(
-                        modifier = Modifier
-                            .background(shape = CircleShape, color = buttonColor)
-                            .height(50.dp)
-                            .width(50.dp)
-                    ) {}
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // Action Buttons (Loan, Withdraw, Deposit, Funds, Transactions)
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    ActionButton(title = "Loan", backgroundColor = cardBackgroundColor)
-                    ActionButton(title = "Withdraw", backgroundColor = cardBackgroundColor)
-                    ActionButton(title = "Deposit", backgroundColor = cardBackgroundColor)
-                    ActionButton(title = "Funds", backgroundColor = cardBackgroundColor)
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // Info Cards for quick access to features (Loans, Deposits, Withdrawals, etc.)
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    InfoCard(title = "Loans", description = "Apply for a loan easily.", backgroundColor = cardBackgroundColor)
-                    InfoCard(title = "Deposit", description = "Deposit money into your account.", backgroundColor = cardBackgroundColor)
-                    InfoCard(title = "Withdraw", description = "Withdraw funds from your account.", backgroundColor = cardBackgroundColor)
-                    InfoCard(title = "Transactions", description = "View your transaction history.", backgroundColor = cardBackgroundColor)
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // Scrollable section for transactions or other features
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(count = 10) { index ->
-                        CreditCard(
-                            cardNumber = "9860 1111 2222 3333",
-                            balance = "$1 000",
-                            bankName = "BRB",
-                            cardName = "Uzcard",
-                            backgroundColor = buttonColor
-                        )
+                        Modifier.weight(1f).fillMaxHeight().background(Color(0xFFF6F6F6))
+                    ) {
+                        navigator.lastItem.Content()
                     }
                 }
             }
         }
     }
-}
 
-// ActionButton for performing bank actions
-@Composable
-fun ActionButton(title: String, backgroundColor: Color) {
-    Button(
-        onClick = { /* Handle click action, e.g., navigate to the respective screen */ },
-        modifier = Modifier
-            .height(100.dp)
+    // Sidebar Composable
+    @Composable
+    fun Sidebar(navigator: Navigator) {
+        // Observe the current screen from the navigator
+        val currentScreen = navigator.lastItem
+        val selectedItem = remember(currentScreen) {
+            when (currentScreen) {
+                is DashboardScreen -> "Dashboard"
+                is LoanScreen -> "Loans"
+                is DepositScreen -> "Deposits"
+                is WithdrawalScreen -> "Withdrawals"
+                is TransactionHistoryScreen -> "Transaction History"
+                is AccountDetailsScreen -> "Account Details"
+                else -> "Dashboard"
+            }
+        }
 
-            .padding(8.dp),
-        colors = ButtonDefaults.buttonColors(backgroundColor = backgroundColor)
-    ) {
-        Text(text = title, color = Color.White, fontSize = 18.sp)
-    }
-}
-
-// InfoCard to display important bank features
-@Composable
-fun InfoCard(title: String, description: String, backgroundColor: Color) {
-    Card(
-        modifier = Modifier
-            .height(150.dp)
-            .padding(8.dp)
-        ,
-        shape = RoundedCornerShape(8.dp),
-        elevation = 4.dp
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = backgroundColor)
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
+        Column(
+            Modifier.width(200.dp).fillMaxHeight().background(Color(0xFF002366)).padding(16.dp)
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = title, color = Color.White, fontSize = 22.sp)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = description, color = Color.White, fontSize = 14.sp)
+            Text(
+                "BANK LOGO", color = Color.White, fontSize = 24.sp, modifier = Modifier.padding(8.dp)
+            )
+            Spacer(Modifier.height(16.dp))
+
+            // Sidebar items
+            SidebarItem(
+                label = "Dashboard",
+                isSelected = selectedItem == "Dashboard",
+                onClick = { navigator.replace(DashboardScreen()) })
+            SidebarItem(
+                label = "Loans", isSelected = selectedItem == "Loans", onClick = { navigator.replace(LoanScreen()) })
+            SidebarItem(
+                label = "Deposits",
+                isSelected = selectedItem == "Deposits",
+                onClick = { navigator.replace(DepositScreen()) })
+            SidebarItem(
+                label = "Withdrawals",
+                isSelected = selectedItem == "Withdrawals",
+                onClick = { navigator.replace(WithdrawalScreen()) })
+            SidebarItem(
+                label = "Transaction History",
+                isSelected = selectedItem == "Transaction History",
+                onClick = { navigator.replace(TransactionHistoryScreen()) })
+            SidebarItem(
+                label = "Account Details",
+                isSelected = selectedItem == "Account Details",
+                onClick = { navigator.replace(AccountDetailsScreen()) })
+        }
+    }
+
+    @Composable
+    fun SidebarItem(label: String, isSelected: Boolean, onClick: () -> Unit) {
+        Text(
+            text = label,
+            color = if (isSelected) Color.Yellow else Color.White, // Highlight the selected item
+            fontSize = 16.sp,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                .background(if (isSelected) Color(0xFF003399) else Color.Transparent)
+                .clickable { onClick() }
+                .padding(all = 4.dp) // Optional background highlight
+        )
+    }
+
+
+}
+
+// Dashboard Screen
+class DashboardScreen() : Screen {
+    @Composable
+    @Preview
+    override fun Content() {
+        MaterialTheme {
+            Column(Modifier.fillMaxSize().background(Color(0xFFF6F6F6)).padding(16.dp)) {
+                TopBar()
+                Spacer(Modifier.height(16.dp))
+                MainContent()
             }
         }
     }
-}
 
-// Credit Card representation
-@Composable
-fun CreditCard(
-    cardNumber: String,
-    balance: String,
-    bankName: String,
-    cardName: String,
-    backgroundColor: Color
-) {
-    Card(
-        modifier = Modifier
-            .height(150.dp)
-            .width(250.dp)
-            .padding(8.dp),
-        shape = RoundedCornerShape(8.dp),
-        elevation = 4.dp
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = backgroundColor)
-                .padding(16.dp),
-            contentAlignment = Alignment.TopCenter
+    @Composable
+    fun TopBar() {
+        var showNotifications by remember { mutableStateOf(false) }
+        var showSettings by remember { mutableStateOf(false) }
+
+        val view = viewModel { HomeScreenViewModel() }
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceAround) {
-                Row {
-                    Text(bankName)
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(cardName)
+            BasicTextField(
+                value = view.searchText.value,
+                onValueChange = {
+                    view.searchText.value = it
+                },
+                textStyle = TextStyle(color = Color.Gray, fontSize = 14.sp),
+                modifier = Modifier.weight(1f).background(Color.White).padding(8.dp)
+            )
+            Spacer(Modifier.width(16.dp))
+            Icon(
+                Icons.Default.Notifications,
+                contentDescription = "Notifications",
+                tint = Color.Gray,
+                modifier = Modifier.clickable(
+                    onClick = {
+
+                    })
+            )
+            Spacer(Modifier.width(8.dp))
+            Icon(
+                Icons.Default.Settings,
+                contentDescription = "Settings",
+                tint = Color.Gray,
+                modifier = Modifier.clickable(
+                    onClick = {
+
+                    })
+            )
+            // Notification Panel
+            AnimatedVisibility(
+                visible = showNotifications,
+                enter = slideInHorizontally(initialOffsetX = { it }) + fadeIn(),
+                exit = slideOutHorizontally(targetOffsetX = { it }) + fadeOut()
+            ) {
+                NotificationPanel(onClose = { showNotifications = false })
+            }
+
+            // Settings Panel
+            AnimatedVisibility(
+                visible = showSettings,
+                enter = slideInHorizontally(initialOffsetX = { it }) + fadeIn(),
+                exit = slideOutHorizontally(targetOffsetX = { it }) + fadeOut()
+            ) {
+                SettingsPanel(onClose = { showSettings = false })
+            }
+        }
+    }
+
+    @Composable
+    fun MainContent() {
+        val navigator = LocalNavigator.current
+
+        var showNotifications by remember { mutableStateOf(false) }
+        var showSettings by remember { mutableStateOf(false) }
+        Column {
+            Text("Banking Services Overview", fontSize = 20.sp, color = Color.Gray)
+
+            Spacer(Modifier.height(16.dp))
+
+            // Total Balance and Currency Prices
+            TotalBalanceAndCurrency()
+
+            Spacer(Modifier.height(16.dp))
+
+            // Service Cards: Evenly distributed
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                ServiceCard(
+                    "Loan Management",
+                    "Active Loans: $12,000",
+                    Color(0xFF4CAF50),
+                    Modifier.size(150.dp).padding(10.dp).background(Color(0xFF4CAF50)).clickable(onClick = {
+                        navigator?.replace(LoanScreen())
+                    }).padding(16.dp).weight(1f)
+                )
+                ServiceCard(
+                    "Deposits",
+                    "Total: $25,000",
+                    Color(0xFFFFC107),
+                    Modifier.size(150.dp).padding(10.dp).background(Color(0xFFFFC107)).clickable(onClick = {
+                        navigator?.replace(DepositScreen())
+                    }).padding(16.dp).weight(1f)
+                )
+                ServiceCard(
+                    "Withdrawals",
+                    "Pending: $3,500",
+                    Color(0xFF2196F3),
+                    Modifier.size(150.dp).padding(10.dp).background(Color(0xFF2196F3)).clickable(onClick = {
+                        navigator?.replace(WithdrawalScreen())
+                    }).padding(16.dp).weight(1f)
+                )
+                ServiceCard(
+                    "Transactions",
+                    "Recent: $2,500",
+                    Color(0xFFFF5722),
+                    Modifier.size(150.dp).padding(10.dp).background(Color(0xFFFF5722)).clickable(onClick = {
+                        navigator?.replace(TransactionHistoryScreen())
+                    }).padding(16.dp).weight(1f)
+                )
+            }
+            Row {
+                Column(Modifier.fillMaxWidth(0.7f)) {
+                    Spacer(Modifier.height(16.dp))
+
+                    // Credit Cards: Evenly distributed
+                    Text("Credit Cards", fontSize = 20.sp, color = Color.Gray)
+                    Spacer(Modifier.height(8.dp))
+                    Row(
+                        Modifier.fillMaxWidth().padding(horizontal = 16.dp).horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+
+                        for (i in 1..10) {
+                            CreditCard("Visa", "9869 2221 3456 7897", "$5,000", Color(0xFF1E88E5))
+                        }
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    // Transaction History
+                    Text("Recent Transactions", fontSize = 20.sp, color = Color.Gray)
+                    Spacer(Modifier.height(8.dp))
+                    Column(Modifier.weight(0.5f).verticalScroll(rememberScrollState())) {
+                        TransactionList()
+                        TransactionList()
+                        TransactionList()
+                        TransactionList()
+                        TransactionList()
+                        TransactionList()
+                        TransactionList()
+                        TransactionList()
+                        TransactionList()
+                        TransactionList()
+                        TransactionList()
+                    }
                 }
-                Spacer(Modifier.height(10.dp))
-                Text(cardNumber)
-                Spacer(Modifier.height(10.dp))
-                Text(balance)
+
+                Column(Modifier.fillMaxWidth()) {
+                    Spacer(Modifier.height(16.dp))
+                    Text("Applications", fontSize = 20.sp, color = Color.Gray)
+                    Spacer(Modifier.height(16.dp))
+                    Column(Modifier.verticalScroll(rememberScrollState())) {
+                        ApplicationItem("Super Car:Ferrari F8", "Car loan", "Approved", LocalDate.now(), "$1 000 000")
+                        ApplicationItem("Super Car:Ferrari F8", "Car loan", "Rejected", LocalDate.now(), "$1 000 000")
+                        ApplicationItem("Super Car:Ferrari F8", "Car loan", "Waiting", LocalDate.now(), "$1 000 000")
+                        ApplicationItem("Super Car:Ferrari F8", "Car loan", "Approved", LocalDate.now(), "$1 000 000")
+                        ApplicationItem("Super Car:Ferrari F8", "Car loan", "Approved", LocalDate.now(), "$1 000 000")
+                        ApplicationItem("Super Car:Ferrari F8", "Car loan", "Approved", LocalDate.now(), "$1 000 000")
+                        ApplicationItem("Super Car:Ferrari F8", "Car loan", "Rejected", LocalDate.now(), "$1 000 000")
+                        ApplicationItem("Super Car:Ferrari F8", "Car loan", "Waiting", LocalDate.now(), "$1 000 000")
+                        ApplicationItem("Super Car:Ferrari F8", "Car loan", "Approved", LocalDate.now(), "$1 000 000")
+                        ApplicationItem("Super Car:Ferrari F8", "Car loan", "Approved", LocalDate.now(), "$1 000 000")
+                        ApplicationItem("Super Car:Ferrari F8", "Car loan", "Approved", LocalDate.now(), "$1 000 000")
+                        ApplicationItem("Super Car:Ferrari F8", "Car loan", "Rejected", LocalDate.now(), "$1 000 000")
+                        ApplicationItem("Super Car:Ferrari F8", "Car loan", "Waiting", LocalDate.now(), "$1 000 000")
+                        ApplicationItem("Super Car:Ferrari F8", "Car loan", "Approved", LocalDate.now(), "$1 000 000")
+                        ApplicationItem("Super Car:Ferrari F8", "Car loan", "Approved", LocalDate.now(), "$1 000 000")
+                    }
+                }
+            }
+
+        }
+    }
+
+
+    @Composable
+    fun NotificationPanel(onClose: () -> Unit) {
+        Box(
+            Modifier
+                .fillMaxHeight()
+                .width(300.dp)
+                .background(Color(0xFF1E88E5), RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp))
+                .padding(16.dp)
+        ) {
+            Column(
+                Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("Notifications", color = Color.White, style = MaterialTheme.typography.h6)
+                Button(onClick = onClose, colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)) {
+                    Text("Close", color = Color(0xFF1E88E5))
+                }
             }
         }
     }
+
+    @Composable
+    fun SettingsPanel(onClose: () -> Unit) {
+        Box(
+            Modifier
+                .fillMaxHeight()
+                .width(300.dp)
+                .background(Color(0xFF4CAF50), RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp))
+                .padding(16.dp)
+        ) {
+            Column(
+                Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("Settings", color = Color.White, style = MaterialTheme.typography.h6)
+                Button(onClick = onClose, colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)) {
+                    Text("Close", color = Color(0xFF4CAF50))
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun TotalBalanceAndCurrency() {
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text("Total Balance", fontSize = 18.sp, color = Color.Gray)
+                Text("$52,000", fontSize = 24.sp, color = Color.Black)
+            }
+            Column {
+                Text("Currency Prices (USD)", fontSize = 18.sp, color = Color.Gray)
+                Text("1 USD = 1.2 EUR", fontSize = 14.sp, color = Color.Black)
+                Text("1 USD = 110 JPY", fontSize = 14.sp, color = Color.Black)
+            }
+        }
+    }
+
+    @Composable
+    fun ServiceCard(title: String, details: String, color: Color, modifier: Modifier) {
+        Box(
+            modifier
+        ) {
+            Column {
+                Text(text = title, color = Color.White, fontSize = 16.sp)
+                Spacer(Modifier.height(8.dp))
+                Text(text = details, color = Color.White, fontSize = 14.sp)
+            }
+        }
+    }
+
+    @Composable
+    fun CreditCard(name: String, cardNumber: String, balance: String, color: Color) {
+        Box(
+            Modifier.size(250.dp).aspectRatio(3 / 2f)
+                .background(color, shape = RoundedCornerShape(16.dp)).padding(16.dp)
+        ) {
+            Column {
+                Text(name, color = Color.White, fontSize = 18.sp)
+                Spacer(Modifier.height(8.dp))
+                Text(cardNumber, color = Color.White, fontSize = 15.sp)
+                Spacer(Modifier.height(8.dp))
+                Text("Balance: $balance", color = Color.White, fontSize = 14.sp)
+            }
+        }
+    }
+
+    @Composable
+    fun TransactionList() {
+        Column(Modifier.padding(horizontal = 16.dp)) {
+            TransactionItem("Withdrawal", "-$500", "2024-11-15", Color.Red)
+            TransactionItem("Deposit", "+$2,000", "2024-11-12", Color.Green)
+            TransactionItem("Loan Payment", "-$1,000", "2024-11-10", Color.Red)
+        }
+    }
+
+    @Composable
+    fun TransactionItem(description: String, amount: String, date: String, amountColor: Color) {
+        Row(
+            Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(description, fontSize = 16.sp, color = Color.Black)
+                Text(date, fontSize = 12.sp, color = Color.Gray)
+            }
+            Text(amount, fontSize = 16.sp, color = amountColor)
+        }
+    }
+
+    @Composable
+    fun ApplicationItem(name: String, applicationType: String, status: String, date: LocalDate, moneyAmount: String) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+        ) {
+            Column {
+                Text(name)
+                Text(moneyAmount)
+                Text(applicationType)
+            }
+            Text(date.toString())
+            Text(
+                status,
+                color = Color.White,
+                modifier = Modifier.size(width = 100.dp, height = 30.dp).background(
+                    color = when (status) {
+                        "Approved" -> Color(0xff85c1e9)
+                        "Waiting" -> Color.Green
+                        else -> Color.Red
+                    }
+                ).padding(all = 4.dp).align(alignment = Alignment.CenterVertically)
+            )
+        }
+    }
 }
+
+
+
+
+
+
+
+
+

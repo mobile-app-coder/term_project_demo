@@ -1,3 +1,5 @@
+package network
+
 object BankClient {
     init {
         //System.setProperty("java.library.path", "${projectDir}/c_code")
