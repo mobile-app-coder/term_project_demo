@@ -41,3 +41,4 @@ class LoginViewModel : ViewModel() {
         return User(name, date, address, email, phone, login, password)
     }
 }
+
