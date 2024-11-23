@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,11 +23,22 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import network.Network
+
+
 import viewmodels.HomeScreenViewModel
 import java.time.LocalDate
 
+
+external fun sendMessage(socket: Int, message: String)
+
+
 // Main HomeScreen with a permanent sidebar
-class HomeScreen : Screen {
+class HomeScreen() : Screen {
     @Composable
     @Preview
     override fun Content() {
@@ -51,8 +63,21 @@ class HomeScreen : Screen {
     // Sidebar Composable
     @Composable
     fun Sidebar(navigator: Navigator) {
+        val viewModel = viewModel { HomeScreenViewModel() }
         // Observe the current screen from the navigator
+        val coroutineScope = rememberCoroutineScope()
         val currentScreen = navigator.lastItem
+
+        coroutineScope.launch {
+            withContext(Dispatchers.IO) {
+                while (true) {
+                    val messageFromServer = Network.getMessage()
+                    if (!messageFromServer.isNullOrEmpty()) {
+                        viewModel.addItem(messageFromServer)
+                    }
+                }
+            }
+        }
         val selectedItem = remember(currentScreen) {
             when (currentScreen) {
                 is DashboardScreen -> "Dashboard"
@@ -64,6 +89,8 @@ class HomeScreen : Screen {
                 else -> "Dashboard"
             }
         }
+
+
 
         Column(
             Modifier.width(200.dp).fillMaxHeight().background(Color(0xFF002366)).padding(16.dp)
@@ -96,6 +123,16 @@ class HomeScreen : Screen {
                 label = "Account Details",
                 isSelected = selectedItem == "Account Details",
                 onClick = { navigator.replace(AccountDetailsScreen()) })
+            Button(onClick = {
+                //viewModel.connectServer()
+                coroutineScope.launch {
+                    withContext(Dispatchers.IO) {
+
+                    }
+                }
+            }) {
+                Text("Connect")
+            }
         }
     }
 
@@ -106,8 +143,7 @@ class HomeScreen : Screen {
             color = if (isSelected) Color.Yellow else Color.White, // Highlight the selected item
             fontSize = 16.sp,
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                .background(if (isSelected) Color(0xFF003399) else Color.Transparent)
-                .clickable { onClick() }
+                .background(if (isSelected) Color(0xFF003399) else Color.Transparent).clickable { onClick() }
                 .padding(all = 4.dp) // Optional background highlight
         )
     }
@@ -132,6 +168,7 @@ class DashboardScreen() : Screen {
     @Composable
     fun TopBar() {
         val view = viewModel { HomeScreenViewModel() }
+
         Row(
             Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -188,62 +225,35 @@ class DashboardScreen() : Screen {
 
                 // Service Cards: Evenly distributed
                 Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     ServiceCard(
-                        "Loan Management",
-                        "Active Loans: $12,000",
+                        "Loan Management", "Active Loans: $12,000",
 
-                        Modifier
-                            .size(150.dp)
-                            .padding(10.dp)
-                            .background(Color(0xFF4CAF50))
-                            .clickable(onClick = {
-                                navigator?.replace(LoanScreen())
-                            })
-                            .padding(16.dp).weight(1f)
+                        Modifier.size(150.dp).padding(10.dp).background(Color(0xFF4CAF50)).clickable(onClick = {
+                            navigator?.replace(LoanScreen())
+                        }).padding(16.dp).weight(1f)
                     )
                     ServiceCard(
-                        "Deposits",
-                        "Total: $25,000",
+                        "Deposits", "Total: $25,000",
 
-                        Modifier
-                            .size(150.dp)
-                            .padding(10.dp)
-                            .background(Color(0xFFFFC107))
-                            .clickable(onClick = {
-                                navigator?.replace(DepositScreen())
-                            })
-                            .padding(16.dp)
-                            .weight(1f)
+                        Modifier.size(150.dp).padding(10.dp).background(Color(0xFFFFC107)).clickable(onClick = {
+                            navigator?.replace(DepositScreen())
+                        }).padding(16.dp).weight(1f)
                     )
                     ServiceCard(
-                        "Withdrawals",
-                        "Pending: $3,500",
+                        "Withdrawals", "Pending: $3,500",
 
-                        Modifier
-                            .size(150.dp)
-                            .padding(10.dp)
-                            .background(Color(0xFF2196F3))
-                            .clickable(onClick = {
-                                navigator?.replace(WithdrawalScreen())
-                            })
-                            .padding(16.dp).weight(1f)
+                        Modifier.size(150.dp).padding(10.dp).background(Color(0xFF2196F3)).clickable(onClick = {
+                            navigator?.replace(WithdrawalScreen())
+                        }).padding(16.dp).weight(1f)
                     )
                     ServiceCard(
-                        "Transactions",
-                        "Recent: $2,500",
+                        "Transactions", "Recent: $2,500",
 
-                        Modifier.size(150.dp)
-                            .padding(10.dp)
-                            .background(Color(0xFFFF5722))
-                            .clickable(onClick = {
-                                navigator?.replace(TransactionHistoryScreen())
-                            })
-                            .padding(16.dp).weight(1f)
+                        Modifier.size(150.dp).padding(10.dp).background(Color(0xFFFF5722)).clickable(onClick = {
+                            navigator?.replace(TransactionHistoryScreen())
+                        }).padding(16.dp).weight(1f)
                     )
                 }
                 Row {
@@ -252,16 +262,11 @@ class DashboardScreen() : Screen {
 
                         // Credit Cards: Evenly distributed
                         Text(
-                            "Credit Cards",
-                            fontSize = 20.sp,
-                            color = Color.Gray
+                            "Credit Cards", fontSize = 20.sp, color = Color.Gray
                         )
                         Spacer(Modifier.height(8.dp))
                         Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                                .horizontalScroll(rememberScrollState()),
+                            Modifier.fillMaxWidth().padding(horizontal = 16.dp).horizontalScroll(rememberScrollState()),
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             for (i in 1..10) {
@@ -272,8 +277,9 @@ class DashboardScreen() : Screen {
                         Text("Recent Transactions", fontSize = 20.sp, color = Color.Gray)
 
                         Column(Modifier.verticalScroll(rememberScrollState())) {
-                            for (i in 1..10) {
-                                TransactionList()
+                            //show messages
+                            viewModel.items.forEach { s: String ->
+                                TransactionItem(s, s, "today", Color.Green)
                             }
 
                         }
@@ -286,11 +292,7 @@ class DashboardScreen() : Screen {
                         Column(Modifier.verticalScroll(rememberScrollState())) {
                             for (i in 1..10) {
                                 ApplicationItem(
-                                    "Super Car:Ferrari F8",
-                                    "Car loan",
-                                    "Approved",
-                                    LocalDate.now(),
-                                    "$1 000 000"
+                                    "Super Car:Ferrari F8", "Car loan", "Approved", LocalDate.now(), "$1 000 000"
                                 )
                             }
                         }
@@ -323,11 +325,8 @@ class DashboardScreen() : Screen {
 @Composable
 fun NotificationPanel(onClose: () -> Unit) {
     Box(
-        Modifier
-            .fillMaxHeight()
-            .width(300.dp)
-            .background(Color(0xFF1E88E5), RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp))
-            .padding(16.dp)
+        Modifier.fillMaxHeight().width(300.dp)
+            .background(Color(0xFF1E88E5), RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp)).padding(16.dp)
     ) {
         Column(
             Modifier.fillMaxSize(),
@@ -345,11 +344,8 @@ fun NotificationPanel(onClose: () -> Unit) {
 @Composable
 fun SettingsPanel(onClose: () -> Unit) {
     Box(
-        Modifier
-            .fillMaxHeight()
-            .width(300.dp)
-            .background(Color(0xFF4CAF50), RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp))
-            .padding(16.dp)
+        Modifier.fillMaxHeight().width(300.dp)
+            .background(Color(0xFF4CAF50), RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp)).padding(16.dp)
     ) {
         Column(
             Modifier.fillMaxSize(),
@@ -400,8 +396,7 @@ fun ServiceCard(title: String, details: String, modifier: Modifier) {
 @Composable
 fun CreditCard(name: String, cardNumber: String, balance: String, color: Color) {
     Box(
-        Modifier.size(250.dp).aspectRatio(3 / 1.5f)
-            .background(color, shape = RoundedCornerShape(16.dp)).padding(16.dp)
+        Modifier.size(250.dp).aspectRatio(3 / 1.5f).background(color, shape = RoundedCornerShape(16.dp)).padding(16.dp)
     ) {
         Column {
             Text(name, color = Color.White, fontSize = 18.sp)
@@ -414,7 +409,7 @@ fun CreditCard(name: String, cardNumber: String, balance: String, color: Color) 
 }
 
 @Composable
-fun TransactionList() {
+fun TransactionList(messages: StateFlow<List<String>>) {
     Column() {
         TransactionItem("Withdrawal", "-$500", "2024-11-15", Color.Red)
         TransactionItem("Deposit", "+$2,000", "2024-11-12", Color.Green)
@@ -449,9 +444,7 @@ fun ApplicationItem(name: String, applicationType: String, status: String, date:
         }
         Text(date.toString())
         Text(
-            status,
-            color = Color.White,
-            modifier = Modifier.size(width = 100.dp, height = 30.dp).background(
+            status, color = Color.White, modifier = Modifier.size(width = 100.dp, height = 30.dp).background(
                 color = when (status) {
                     "Approved" -> Color(0xff85c1e9)
                     "Waiting" -> Color.Green

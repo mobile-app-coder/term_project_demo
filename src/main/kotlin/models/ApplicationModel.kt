@@ -17,8 +17,3 @@ enum class ServiceType(name: String) {
     Withdraw("Withdraw"),
 }
 
-enum class Status {
-    Approved,
-    Rejected,
-    Waiting
-}

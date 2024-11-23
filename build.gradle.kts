@@ -23,29 +23,22 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     //viewmodel
+    //implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0")
     implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
-
     //navigation
     //implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
     val voyagerVersion = "1.1.0-beta02"
-
     // Multiplatform
-
     // Navigator
     implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
-
     // Screen Model
     implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVersion")
-
     // BottomSheetNavigator
     implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVersion")
-
     // TabNavigator
     implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVersion")
-
     // Transitions
     implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
-
     // Koin integration
     implementation("cafe.adriel.voyager:voyager-koin:$voyagerVersion")
 
@@ -57,6 +50,8 @@ dependencies {
 
     // Kodein integration
     implementation("cafe.adriel.voyager:voyager-kodein:$voyagerVersion")
+    implementation("org.jetbrains.compose.desktop:desktop-jvm:1.6.10")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
 
     // RxJava integration
 
