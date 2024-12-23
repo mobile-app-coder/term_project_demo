@@ -17,8 +17,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import viewmodels.LoanApplyViewModel
 
 class ApplyLoanScreen(private val loanType: String) : Screen {
+    private val viewModel = LoanApplyViewModel()
 
     @Composable
     @Preview
@@ -68,31 +70,44 @@ class ApplyLoanScreen(private val loanType: String) : Screen {
 
     @Composable
     fun LoanApplicationForm(loanType: String) {
-        var name by remember { mutableStateOf("") }
-        var income by remember { mutableStateOf("") }
-        var salary by remember { mutableStateOf("") }
-        var amount by remember { mutableStateOf("") }
-        var loanPurpose by remember { mutableStateOf("") }
-        var carType by remember { mutableStateOf("") }
-        var homeLocation by remember { mutableStateOf("") }
+
         var showDialog by remember { mutableStateOf(false) }
 
         val navigator = LocalNavigator.current
 
         Column(verticalArrangement = Arrangement.spacedBy(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            InputField(label = "Full Name", value = name, onValueChange = { name = it })
-            InputField(label = "Monthly Income", value = income, onValueChange = { income = it })
-            InputField(label = "Annual Salary", value = salary, onValueChange = { salary = it })
-            InputField(label = "Loan Amount", value = amount, onValueChange = { amount = it })
-            InputField(label = "Purpose of Loan", value = loanPurpose, onValueChange = { loanPurpose = it })
+            InputField(label = "Full Name", value = viewModel.name.value, onValueChange = { viewModel.name.value = it })
+            InputField(
+                label = "Monthly Income",
+                value = viewModel.incom.value,
+                onValueChange = { viewModel.incom.value = it })
+            InputField(
+                label = "Annual Salary",
+                value = viewModel.salary.value,
+                onValueChange = { viewModel.salary.value = it })
+            InputField(
+                label = "Loan Amount",
+                value = viewModel.amount.value,
+                onValueChange = { viewModel.amount.value = it })
+            InputField(
+                label = "Purpose of Loan",
+                value = viewModel.loanPurpose.value,
+                onValueChange = { viewModel.loanPurpose.value = it })
 
             // Conditional fields based on loan type
             when (loanType) {
                 "Car" -> {
-                    InputField(label = "Car Type (e.g., Sedan, SUV)", value = carType, onValueChange = { carType = it })
+                    InputField(
+                        label = "Car Type (e.g., Sedan, SUV)",
+                        value = viewModel.carType.value,
+                        onValueChange = { viewModel.carType.value = it })
                 }
+
                 "Home" -> {
-                    InputField(label = "Location of Home", value = homeLocation, onValueChange = { homeLocation = it })
+                    InputField(
+                        label = "Location of Home",
+                        value = viewModel.homeLocation.value,
+                        onValueChange = { viewModel.homeLocation.value = it })
                 }
             }
 

@@ -1,7 +1,5 @@
 package screens
 
-
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -14,45 +12,47 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import models.User
 import viewmodels.LoginViewModel
 
-
-data class LoginScreen(val user: User) : Screen {
+ class LoginScreen : Screen {
     @Composable
     override fun Content() {
         val viewModel: LoginViewModel = viewModel { LoginViewModel() }
         val navigator = LocalNavigator.currentOrThrow
-        val backgroundColor = Color(0xFFECEFF1) // Light grey for the scaffold background
-        val textFieldColor = Color(0xFFCFD8DC) // Light blue-grey for text fields
-        val buttonColor = Color(0xFF546E7A) //
+
+        // Colors and design constants
+        val backgroundColor = Color(0xFFF4F6F8) // Light grey background
+        val textFieldBackground = Color.White // White text fields
+        val buttonColor = Color(0xFF546E7A) // Blue-grey for buttons
+        val textColor = Color(0xFF37474F) // Darker text for labels
+
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
                 .background(backgroundColor),
             topBar = {
                 TopAppBar(
-                    title = { Text("Register") },
+                    title = { Text("Register", color = textColor) },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Back",
-                                tint = Color.Black
+                                tint = textColor
                             )
                         }
                     },
                     backgroundColor = backgroundColor,
-                    elevation = 4.dp
+                    elevation = 0.dp
                 )
             }
-
         ) {
             Column(
                 modifier = Modifier
@@ -61,47 +61,47 @@ data class LoginScreen(val user: User) : Screen {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    "Login",
+                    text = "Welcome Back!",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF37474F) // Darker text color
+                    color = textColor
                 )
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    user.name,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF37474F) // Darker text color
+                    text = "Login to continue",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = textColor
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
+                // Input Form
                 Column(
                     modifier = Modifier
-                        .width(600.dp)
+                        .widthIn(min = 300.dp, max = 500.dp)
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Common modifier for text fields
+                    // Text Field Styling
                     val textFieldModifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
-                        .background(textFieldColor, shape = MaterialTheme.shapes.medium)
+                        .background(textFieldBackground, shape = MaterialTheme.shapes.medium)
 
                     val textFieldColors = TextFieldDefaults.outlinedTextFieldColors(
                         backgroundColor = Color.Transparent,
                         focusedBorderColor = buttonColor,
                         unfocusedBorderColor = Color.Gray,
-                        textColor = Color.Black,
+                        textColor = textColor,
                         cursorColor = buttonColor
                     )
-
-
 
                     OutlinedTextField(
                         modifier = textFieldModifier,
                         value = viewModel.login.value,
                         onValueChange = { viewModel.login.value = it },
-                        label = { Text("Login") },
+                        label = { Text("Login", color = textColor) },
                         colors = textFieldColors
                     )
 
@@ -109,11 +109,10 @@ data class LoginScreen(val user: User) : Screen {
                         modifier = textFieldModifier,
                         value = viewModel.password.value,
                         onValueChange = { viewModel.password.value = it },
-                        label = { Text("Password") },
-                        colors = textFieldColors
+                        label = { Text("Password", color = textColor) },
+                        colors = textFieldColors,
+                        visualTransformation = PasswordVisualTransformation()
                     )
-
-
 
                     Spacer(modifier = Modifier.height(24.dp))
 
@@ -130,11 +129,16 @@ data class LoginScreen(val user: User) : Screen {
                         ),
                         shape = MaterialTheme.shapes.medium
                     ) {
-                        Text("Login", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                        Text("Login", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    TextButton(onClick = { /* Navigate to "Forgot Password" */ }) {
+                        Text("Forgot Password?", color = buttonColor)
                     }
                 }
             }
         }
     }
-
 }

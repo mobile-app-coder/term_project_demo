@@ -41,20 +41,17 @@ dependencies {
     implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
     // Koin integration
     implementation("cafe.adriel.voyager:voyager-koin:$voyagerVersion")
-
-    // Android
-
-
-
-    // Desktop + Android
-
     // Kodein integration
     implementation("cafe.adriel.voyager:voyager-kodein:$voyagerVersion")
     implementation("org.jetbrains.compose.desktop:desktop-jvm:1.6.10")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
 
-    // RxJava integration
+    implementation("org.jetbrains.compose.material3:material3-desktop:1.2.1")
 
+    implementation(compose.materialIconsExtended)
+    //converter gson
+    implementation("com.google.code.gson:gson:2.8.9")
+    implementation(compose.materialIconsExtended)
 }
 
 compose.desktop {

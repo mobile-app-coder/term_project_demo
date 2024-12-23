@@ -38,7 +38,15 @@ class LoginViewModel : ViewModel() {
         login: String,
         password: String
     ): User {
-        return User(name, date, address, email, phone, login, password)
+        return User(
+            name = name,
+            date = date,
+            address = address,
+            email = email,
+            phone = phone,
+            login = login,
+            password = password
+        )
     }
 }
 
