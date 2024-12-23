@@ -5,11 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import network.Network
 
 
-class HomeScreenViewModel : ViewModel() {
-
+class HomeScreenViewModel(private val userId: String) : ViewModel() {
     var balance = mutableStateOf("")
 
     val searchText = mutableStateOf("")
@@ -20,23 +22,23 @@ class HomeScreenViewModel : ViewModel() {
     private val _items = mutableStateListOf<String>()
     val items: SnapshotStateList<String> = _items
 
-    fun addItem(item: String) {
-        if (item.isNotBlank()) {
-            _items.add(item)
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            getUserData()
         }
     }
 
-    fun fetchItemsFromServer() {
-        viewModelScope.launch {
-            // Simulating server delay or fetching items
-            val serverItems = listOf("Server Item 1", "Server Item 2")
-            _items.clear()
-            _items.addAll(serverItems)
-        }
-    }
 
-    fun addMessage(message: String) {
-        message.plus(message)
+    private suspend fun getUserData() {
+        val request = "userdata:$userId"
+        Network.sendMessage(request)
+        delay(100)
+        val response = Network.getMessage()
+
+        if (response != null) {
+            println(response)
+        }
     }
 
 }

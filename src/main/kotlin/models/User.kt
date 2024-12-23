@@ -9,9 +9,10 @@ import java.util.*
 import kotlin.random.Random
 
 data class User(
-    val id: String? = null,
-    val name: String,
-    val date: String,
+    var id: String? = null,
+    val firstName: String,
+    val lastName: String,
+    val dateOfBirth: String,
     val address: String,
     val email: String,
     val phone: String,
@@ -19,7 +20,7 @@ data class User(
     val password: String
 ) {
     override fun toString(): String {
-        return "User(name='$name', date='$date', address='$address', email='$email', phone='$phone', login='$login', password='$password')"
+        return "User(name='$firstName', date='$dateOfBirth', address='$address', email='$email', phone='$phone', login='$login', password='$password')"
     }
 }
 
@@ -84,8 +85,9 @@ object UserGenerator {
 
         return User(
             id = UUID.randomUUID().toString(), // Generate unique ID
-            name = "$firstName $lastName",
-            date = formattedDate,
+            firstName = firstName,
+            dateOfBirth = formattedDate,
+            lastName = lastName,
             address = "$streetNumber $streetName, $city",
             email = "${firstName.lowercase()}.${lastName.lowercase()}@example.com",
             phone = generatePhoneNumber(),

@@ -46,7 +46,7 @@ class RegisterScreen : Screen {
         var confirmPasswordVisibility by remember { mutableStateOf(false) }
         // Validation state
         val isFormValid by derivedStateOf {
-            viewModel.name.value.isNotBlank() &&
+            viewModel.firstName.value.isNotBlank() &&
                     selectedDate.isNotBlank() &&
                     viewModel.address.value.isNotBlank() &&
                     viewModel.phone.value.isNotBlank() &&
@@ -70,133 +70,159 @@ class RegisterScreen : Screen {
         ) {
 
             // Main content
-            Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth(0.5f)
-                        .padding(32.dp)
-                        .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    Text(
-                        "Create Your Account",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = textColor
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    // Input fields
-                    val textFieldModifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-
-                    val textFieldColors = TextFieldDefaults.outlinedTextFieldColors(
-                        backgroundColor = textFieldColor,
-                        focusedBorderColor = sidebarColor,
-                        unfocusedBorderColor = Color.Gray,
-                        textColor = textColor,
-                        cursorColor = sidebarColor
-                    )
-
-                    OutlinedTextField(
-                        value = viewModel.name.value,
-                        onValueChange = { viewModel.name.value = it },
-                        label = { Text("Name") },
-                        colors = textFieldColors,
-                        modifier = textFieldModifier
-                    )
-
-                    DateInputField(
-                        onDateChange = {
-                            viewModel.dateOfBirth.value = it
-                            selectedDate = it
-                        }
-                    )
-
-                    OutlinedTextField(
-                        value = viewModel.address.value,
-                        onValueChange = { viewModel.address.value = it },
-                        label = { Text("Address") },
-                        colors = textFieldColors,
-                        modifier = textFieldModifier
-                    )
-
-                    PhoneInputField(
-                        phoneNumber = viewModel.phone.value,
-                        onPhoneChange = {
-                            viewModel.phone.value = it
-                        }
-                    )
-
-                    OutlinedTextField(
-                        value = viewModel.email.value,
-                        onValueChange = { viewModel.email.value = it },
-                        label = { Text("Email") },
-                        colors = textFieldColors,
-                        modifier = textFieldModifier
-                    )
-
-                    OutlinedTextField(
-                        value = viewModel.login.value,
-                        onValueChange = { viewModel.login.value = it },
-                        label = { Text("Login") },
-                        colors = textFieldColors,
-                        modifier = textFieldModifier
-                    )
-
-
-                    OutlinedTextField(
-                        value = viewModel.password.value,
-                        onValueChange = { viewModel.password.value = it },
-                        label = { Text("Password") },
-                        colors = textFieldColors,
-                        modifier = textFieldModifier,
-                        visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                        trailingIcon = {
-                            IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
-                                Icon(
-                                    imageVector = if (passwordVisibility) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                    contentDescription = if (passwordVisibility) "Hide Password" else "Show Password"
-                                )
-                            }
-                        }
-                    )
-
-                    OutlinedTextField(
-                        value = viewModel.passwordConfirmation.value,
-                        onValueChange = { viewModel.passwordConfirmation.value = it },
-                        label = { Text("Confirm Password") },
-                        colors = textFieldColors,
-                        modifier = textFieldModifier,
-                        visualTransformation = if (confirmPasswordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                        trailingIcon = {
-                            IconButton(onClick = { confirmPasswordVisibility = !confirmPasswordVisibility }) {
-                                Icon(
-                                    imageVector = if (confirmPasswordVisibility) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                    contentDescription = if (confirmPasswordVisibility) "Hide Password" else "Show Password"
-                                )
-                            }
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    Button(
-                        onClick = {
-                            viewModel.register(navigator)
-                            //navigator.push(LoginScreen())
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = if (isFormValid) buttonColor else Color.Gray,
-                            contentColor = Color.White
-                        ),
+            if (viewModel.isLoading.value) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator(color = sidebarColor)
+                        Text("Wait, your data is processing")
+                    }
+                }
+            } else {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        //enabled = isFormValid
+                            .fillMaxWidth(0.5f)
+                            .padding(32.dp)
+                            .verticalScroll(rememberScrollState()),
+                        horizontalAlignment = Alignment.Start
                     ) {
-                        Text("Register", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                        Text(
+                            "Create Your Account",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = textColor
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        // Input fields
+                        val textFieldModifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+
+                        val textFieldColors = TextFieldDefaults.outlinedTextFieldColors(
+                            backgroundColor = textFieldColor,
+                            focusedBorderColor = sidebarColor,
+                            unfocusedBorderColor = Color.Gray,
+                            textColor = textColor,
+                            cursorColor = sidebarColor
+                        )
+
+                        OutlinedTextField(
+                            value = viewModel.firstName.value,
+                            onValueChange = { viewModel.firstName.value = it },
+                            label = { Text("First name") },
+                            colors = textFieldColors,
+                            modifier = textFieldModifier
+                        )
+
+                        OutlinedTextField(
+                            value = viewModel.lastName.value,
+                            onValueChange = { viewModel.firstName.value = it },
+                            label = { Text("Last name") },
+                            colors = textFieldColors,
+                            modifier = textFieldModifier
+                        )
+
+                        DateInputField(
+                            onDateChange = {
+                                viewModel.dateOfBirth.value = it
+                                selectedDate = it
+                            }
+                        )
+
+                        OutlinedTextField(
+                            value = viewModel.address.value,
+                            onValueChange = { viewModel.address.value = it },
+                            label = { Text("Address") },
+                            colors = textFieldColors,
+                            modifier = textFieldModifier
+                        )
+
+                        PhoneInputField(
+                            phoneNumber = viewModel.phone.value,
+                            onPhoneChange = {
+                                viewModel.phone.value = it
+                            }
+                        )
+
+                        OutlinedTextField(
+                            value = viewModel.email.value,
+                            onValueChange = { viewModel.email.value = it },
+                            label = { Text("Email") },
+                            colors = textFieldColors,
+                            modifier = textFieldModifier
+                        )
+
+                        OutlinedTextField(
+                            value = viewModel.login.value,
+                            onValueChange = { viewModel.login.value = it },
+                            label = { Text("Login") },
+                            colors = textFieldColors,
+                            modifier = textFieldModifier
+                        )
+
+
+                        OutlinedTextField(
+                            value = viewModel.password.value,
+                            onValueChange = { viewModel.password.value = it },
+                            label = { Text("Password") },
+                            colors = textFieldColors,
+                            modifier = textFieldModifier,
+                            visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                            trailingIcon = {
+                                IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                                    Icon(
+                                        imageVector = if (passwordVisibility) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                        contentDescription = if (passwordVisibility) "Hide Password" else "Show Password"
+                                    )
+                                }
+                            }
+                        )
+
+                        OutlinedTextField(
+                            value = viewModel.passwordConfirmation.value,
+                            onValueChange = { viewModel.passwordConfirmation.value = it },
+                            label = { Text("Confirm Password") },
+                            colors = textFieldColors,
+                            modifier = textFieldModifier,
+                            visualTransformation = if (confirmPasswordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                            trailingIcon = {
+                                IconButton(onClick = { confirmPasswordVisibility = !confirmPasswordVisibility }) {
+                                    Icon(
+                                        imageVector = if (confirmPasswordVisibility) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                        contentDescription = if (confirmPasswordVisibility) "Hide Password" else "Show Password"
+                                    )
+                                }
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        Button(
+                            onClick = {
+                                viewModel.register(navigator)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = if (isFormValid) buttonColor else Color.Gray,
+                                contentColor = Color.White
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            //enabled = isFormValid
+                        ) {
+                            Text("Register", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                        }
+
+                        if (viewModel.errorMessage.value.isNotBlank()) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = viewModel.errorMessage.value,
+                                color = Color.Red,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
+                        }
                     }
                 }
             }

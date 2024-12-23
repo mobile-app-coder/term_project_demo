@@ -21,17 +21,17 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import viewmodels.LoginViewModel
 
- class LoginScreen : Screen {
+class LoginScreen : Screen {
     @Composable
     override fun Content() {
         val viewModel: LoginViewModel = viewModel { LoginViewModel() }
         val navigator = LocalNavigator.currentOrThrow
 
         // Colors and design constants
-        val backgroundColor = Color(0xFFF4F6F8) // Light grey background
         val textFieldBackground = Color.White // White text fields
-        val buttonColor = Color(0xFF546E7A) // Blue-grey for buttons
-        val textColor = Color(0xFF37474F) // Darker text for labels
+        val backgroundColor = Color(0xFFF4F6F8) // Light grey
+        val buttonColor = Color(0xFF6200EA) // Purple
+        val textColor = Color(0xFF212121) // Dark gray
 
         Scaffold(
             modifier = Modifier
@@ -99,16 +99,16 @@ import viewmodels.LoginViewModel
 
                     OutlinedTextField(
                         modifier = textFieldModifier,
-                        value = viewModel.login.value,
-                        onValueChange = { viewModel.login.value = it },
+                        value = viewModel.login,
+                        onValueChange = { viewModel.login = it },
                         label = { Text("Login", color = textColor) },
                         colors = textFieldColors
                     )
 
                     OutlinedTextField(
                         modifier = textFieldModifier,
-                        value = viewModel.password.value,
-                        onValueChange = { viewModel.password.value = it },
+                        value = viewModel.password,
+                        onValueChange = { viewModel.password = it },
                         label = { Text("Password", color = textColor) },
                         colors = textFieldColors,
                         visualTransformation = PasswordVisualTransformation()
@@ -116,26 +116,40 @@ import viewmodels.LoginViewModel
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    Button(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        onClick = {
-                            navigator.replaceAll(CreateAccountScreen())
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = buttonColor,
-                            contentColor = Color.White
-                        ),
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        Text("Login", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    if (viewModel.isLoading) {
+                        CircularProgressIndicator()
+
+                    } else {
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            onClick = {
+                                viewModel.login(navigator)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = buttonColor,
+                                contentColor = Color.White
+                            ),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Text("Login", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    if (viewModel.errorMessage.isNotEmpty()) {
+                        Column {
+                            Text(viewModel.errorMessage)
+                            Spacer(Modifier.height(16.dp))
+                        }
+                    }
+
+
                     TextButton(onClick = { /* Navigate to "Forgot Password" */ }) {
                         Text("Forgot Password?", color = buttonColor)
+
                     }
                 }
             }

@@ -5,7 +5,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import network.Network
-import screens.RegisterScreen
+import screens.CreateBankAccountScreen
 
 
 fun main() {
@@ -13,7 +13,7 @@ fun main() {
         Window(
             onCloseRequest = ::exitApplication, title = "OS BANKING",
         ) {
-            Navigator(RegisterScreen())
+            Navigator(CreateBankAccountScreen(""))
         }
         val coroutineScope = rememberCoroutineScope()
         coroutineScope.launch(Dispatchers.IO) {

@@ -27,7 +27,7 @@ import java.time.LocalDate
 
 
 // Dashboard Screen
-class DashboardScreen() : Screen {
+class DashboardScreen(private val userId: String? = null) : Screen {
     @Composable
     @Preview
     override fun Content() {
@@ -42,7 +42,7 @@ class DashboardScreen() : Screen {
 
     @Composable
     fun TopBar() {
-        val view = viewModel { HomeScreenViewModel() }
+        val view = viewModel { HomeScreenViewModel(userId!!) }
 
         Row(
             Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
@@ -85,7 +85,7 @@ class DashboardScreen() : Screen {
     fun MainContent() {
         val navigator = LocalNavigator.current
 
-        val viewModel = viewModel { HomeScreenViewModel() }
+        val viewModel = viewModel { HomeScreenViewModel(userId!!) }
 
         Box(contentAlignment = Alignment.CenterEnd) {
             Column {

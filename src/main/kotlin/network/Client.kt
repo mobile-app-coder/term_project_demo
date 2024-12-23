@@ -20,8 +20,7 @@ object Network {
         CoroutineScope(Dispatchers.IO).launch {
             connect(ip, port)
             delay(100)
-            sendMessage("usertype:client:balance")
-            println(getMessage() ?: "null")
+            sendMessage("usertype:client:connect")
         }
     }
 
@@ -34,7 +33,8 @@ object Network {
     }
 
     suspend fun sendMessage(message: String) = withContext(Dispatchers.IO) {
-        var formattedMessage = "usertype:client:$message"
+        val formattedMessage = "usertype:client:$message"
+        println(formattedMessage)
         sendMessageC(socket, formattedMessage)
     }
 

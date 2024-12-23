@@ -20,7 +20,8 @@ import viewmodels.HomeScreenViewModel
 
 
 // Main HomeScreen with a permanent sidebar
-class HomeScreen() : Screen {
+class HomeScreen(private val userId: String? = null) : Screen {
+
     @Composable
     @Preview
     override fun Content() {
@@ -45,7 +46,7 @@ class HomeScreen() : Screen {
     // Sidebar Composable
     @Composable
     fun Sidebar(navigator: Navigator) {
-        val viewModel = viewModel { HomeScreenViewModel() }
+        val viewModel = viewModel { HomeScreenViewModel(userId!!) }
         val currentScreen = navigator.lastItem
 
 
