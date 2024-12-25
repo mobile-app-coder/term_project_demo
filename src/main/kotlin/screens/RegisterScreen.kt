@@ -1,10 +1,9 @@
 package screens
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -12,7 +11,10 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -52,6 +54,7 @@ class RegisterScreen : Screen {
                     viewModel.phone.value.isNotBlank() &&
                     viewModel.email.value.isNotBlank() &&
                     viewModel.login.value.isNotBlank() &&
+                    viewModel.passportId.isNotBlank() &&
                     viewModel.password.value.isNotBlank() &&
                     viewModel.password.value == viewModel.passwordConfirmation.value
         }
@@ -62,9 +65,27 @@ class RegisterScreen : Screen {
                 .background(backgroundColor),
             topBar = {
                 TopAppBar(
+
                     backgroundColor = sidebarColor,
                     contentColor = Color.White,
-                    title = { Text("Register", fontSize = 20.sp, fontWeight = FontWeight.Bold) }
+                    title = {
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(5.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .size(90.dp) // Set a size for the circular container
+                                    .clip(CircleShape)
+                            ) {
+                                Image(
+                                    painter = painterResource("images/logo.jpg"),
+                                    contentDescription = "",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.clip(CircleShape).size(60.dp)
+
+                                )
+                            }
+                            Text("IUT BANK", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
                 )
             }
         ) {
@@ -119,6 +140,14 @@ class RegisterScreen : Screen {
                             value = viewModel.lastName.value,
                             onValueChange = { viewModel.firstName.value = it },
                             label = { Text("Last name") },
+                            colors = textFieldColors,
+                            modifier = textFieldModifier
+                        )
+
+                        OutlinedTextField(
+                            value = viewModel.passportId,
+                            onValueChange = { viewModel.passportId = it },
+                            label = { Text("Passport Id") },
                             colors = textFieldColors,
                             modifier = textFieldModifier
                         )
@@ -201,6 +230,7 @@ class RegisterScreen : Screen {
                         Button(
                             onClick = {
                                 viewModel.register(navigator)
+                                //navigator.replace(LoginScreen())
                             },
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = if (isFormValid) buttonColor else Color.Gray,
@@ -212,6 +242,11 @@ class RegisterScreen : Screen {
                             //enabled = isFormValid
                         ) {
                             Text("Register", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                        }
+                        Row {
+                            Text("Dou you have an account", modifier = Modifier.clickable {
+                                navigator.push(LoginScreen())
+                            })
                         }
 
                         if (viewModel.errorMessage.value.isNotBlank()) {

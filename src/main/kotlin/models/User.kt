@@ -11,6 +11,7 @@ import kotlin.random.Random
 data class User(
     var id: String? = null,
     val firstName: String,
+    val passportId: String,
     val lastName: String,
     val dateOfBirth: String,
     val address: String,
@@ -69,6 +70,7 @@ object UserGenerator {
     private val lastNames = listOf("Doe", "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller")
     private val streetNames = listOf("Main St", "Oak Ave", "Pine Ln", "Maple Dr", "Cedar Rd")
     private val cities = listOf("New York", "Los Angeles", "Chicago", "Houston", "Phoenix")
+    private val passports = listOf("123", "234", "345", "456")
 
     fun generateUser(): User {
         val firstName = firstNames.random()
@@ -76,6 +78,7 @@ object UserGenerator {
         val streetNumber = Random.nextInt(1, 200)
         val streetName = streetNames.random()
         val city = cities.random()
+        val passportId = passports.random()
 
         val birthDate =
             LocalDate.now().minusDays(Random.nextLong(365 * 18, 365 * 60)) // Random date between 18 and 60 years ago
@@ -92,7 +95,8 @@ object UserGenerator {
             email = "${firstName.lowercase()}.${lastName.lowercase()}@example.com",
             phone = generatePhoneNumber(),
             login = "${firstName.lowercase()}${lastName.lowercase()}${Random.nextInt(100)}",
-            password = UUID.randomUUID().toString().substring(0, 12) // Generates random password
+            password = UUID.randomUUID().toString().substring(0, 12),
+            passportId = passportId // Generates random password
         )
     }
 

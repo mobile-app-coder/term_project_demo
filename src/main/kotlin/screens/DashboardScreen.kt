@@ -5,9 +5,7 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
@@ -132,7 +130,7 @@ class DashboardScreen(private val userId: String? = null) : Screen {
                     )
                 }
                 Row {
-                    Column(Modifier.fillMaxWidth(0.7f)) {
+                    Column(Modifier.weight(1f)) {
                         Spacer(Modifier.height(16.dp))
 
                         // Credit Cards: Evenly distributed
@@ -149,18 +147,11 @@ class DashboardScreen(private val userId: String? = null) : Screen {
                             }
                         }
                         // Transaction History
-                        Text("Recent Transactions", fontSize = 20.sp, color = Color.Gray)
+                        Transaction(viewModel)
 
-                        Column(Modifier.verticalScroll(rememberScrollState())) {
-                            //show messages
-                            viewModel.items.forEach { s: String ->
-                                TransactionItem(s, s, "today", Color.Green)
-                            }
-
-                        }
                     }
 
-                    Column(Modifier.fillMaxWidth()) {
+                    Column(Modifier.weight(1f)) {
                         Spacer(Modifier.height(16.dp))
                         Text("Applications", fontSize = 20.sp, color = Color.Gray)
                         Spacer(Modifier.height(16.dp))
@@ -191,6 +182,52 @@ class DashboardScreen(private val userId: String? = null) : Screen {
             ) {
 
                 NotificationPanel(onClose = { viewModel.showNotifications.value = false })
+            }
+        }
+    }
+
+    @Composable
+    fun Transaction(viewModel: HomeScreenViewModel) {
+        Box(modifier = Modifier.fillMaxSize().padding(20.dp)) {
+
+            Column {
+                Text("Transfer your money", fontSize = 20.sp)
+
+                OutlinedTextField(
+                    value = viewModel.transferDestination,
+                    onValueChange = {
+                        viewModel.transferDestination = it
+                    },
+                    label = { Text("Enter account nmuber") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = viewModel.transferMoney,
+                    onValueChange = { viewModel.transferMoney = it },
+                    label = { Text("Enter amount of money") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = viewModel.passportId,
+                    onValueChange = { viewModel.passportId = it },
+                    label = { Text("Enter passport id") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = viewModel.transferDescription,
+                    onValueChange = { viewModel.transferDescription = it },
+                    label = { Text("Description") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedButton(onClick = {
+                    viewModel.transfer()
+                }) {
+                    Text("Apply")
+                }
+
             }
         }
     }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,7 +62,7 @@ class ApplyLoanScreen(private val loanType: String) : Screen {
             modifier = Modifier.padding(bottom = 16.dp)
         ) {
             Icon(
-                Icons.Filled.ArrowBack,
+                Icons.Filled.Image,
                 contentDescription = "Back",
                 tint = Color.Black
             )

@@ -15,36 +15,32 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import viewmodels.CreateAccountViewModel
+import viewmodel.CreateAccountViewModel
+
 
 class CreateBankAccountScreen(private val userId: String) : Screen {
     @Composable
     @Preview
     override fun Content() {
-
-        val viewModel = viewModel {
-            CreateAccountViewModel(userId)
-        }
-
+        val viewModel = viewModel { CreateAccountViewModel(userId) }
         val backgroundColor = Color(0xFFF4F6F8) // Light grey
         val buttonColor = Color(0xFF6200EA) // Purple
         val textFieldColor = Color(0xFFFFFFFF) // White
         val navigator = LocalNavigator.currentOrThrow
+        val coroutineScope = rememberCoroutineScope()
 
         // State for form inputs
-        var accountHolderName by remember { mutableStateOf("") }
-        var accountType by remember { mutableStateOf("Select Account Type") }
-        var initialDeposit by remember { mutableStateOf("") }
+
 
         // Dropdown menu states
-        var expanded by remember { mutableStateOf(false) }
-        val accountTypes = listOf("Checking", "Savings", "Business", "Fixed Deposit")
+        var expandedType by remember { mutableStateOf(false) }
+        var expandedCurrency by remember { mutableStateOf(false) }
 
         Scaffold(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .background(color = backgroundColor),
-
-            ) {
+        ) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(
                     modifier = Modifier
@@ -64,8 +60,8 @@ class CreateBankAccountScreen(private val userId: String) : Screen {
                     // Account Holder Name Field
                     Text("Account Holder Name:")
                     OutlinedTextField(
-                        value = accountHolderName,
-                        onValueChange = { accountHolderName = it },
+                        value = viewModel.accountHolderName,
+                        onValueChange = { viewModel.accountHolderName = it },
                         modifier = Modifier.fillMaxWidth(),
                         placeholder = { Text("Enter Account Holder Name") },
                         colors = TextFieldDefaults.textFieldColors(backgroundColor = textFieldColor)
@@ -75,38 +71,67 @@ class CreateBankAccountScreen(private val userId: String) : Screen {
 
                     // Account Type Dropdown
                     Text("Account Type:")
-
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = { expanded = !expanded }, content = {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(accountType)
-                                DropdownMenu(
-                                    expanded = expanded,
-                                    onDismissRequest = { expanded = false },
-                                    modifier = Modifier.fillMaxWidth(0.6f)
-                                ) {
-                                    viewModel.types.forEach { type ->
-                                        DropdownMenuItem(onClick = {
-                                            accountType = type.name
-                                            expanded = false
-                                        }) {
-                                            Text(type.name)
-                                        }
-                                    }
+                    Box {
+                        Button(
+                            onClick = { expandedType = !expandedType },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = viewModel.selectedTypeName
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = expandedType,
+                            onDismissRequest = { expandedType = false },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            viewModel.types.forEach { type ->
+                                DropdownMenuItem(onClick = {
+                                    viewModel.selectType(type)
+                                    expandedType = false
+                                }) {
+                                    Text(type.name)
                                 }
                             }
-                        })
+                        }
+                    }
 
+                    Spacer(modifier = Modifier.height(10.dp))
 
+                    // Currency Dropdown
+                    Text("Currency:")
+                    Box {
+                        Button(
+                            onClick = { expandedCurrency = !expandedCurrency },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = viewModel.selectedCurrency.name
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = expandedCurrency,
+                            onDismissRequest = { expandedCurrency = false },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            viewModel.currencies.forEach { currency ->
+                                DropdownMenuItem(onClick = {
+                                    viewModel.selectCurrency(currency)
+                                    expandedCurrency = false
+                                }) {
+                                    Text(currency.name)
+                                }
+                            }
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(10.dp))
 
                     // Initial Deposit Field
                     Text("Initial Deposit:")
                     OutlinedTextField(
-                        value = initialDeposit,
-                        onValueChange = { initialDeposit = it },
+                        value = viewModel.initialDeposit,
+                        onValueChange = { viewModel.initialDeposit = it },
                         modifier = Modifier.fillMaxWidth(),
                         placeholder = { Text("Enter Initial Deposit") },
                         colors = TextFieldDefaults.textFieldColors(backgroundColor = textFieldColor)
@@ -117,12 +142,7 @@ class CreateBankAccountScreen(private val userId: String) : Screen {
                     // Submit Button
                     Button(
                         onClick = {
-                            // Handle the account creation logic here
-                            // You can pass the user inputs (accountHolderName, accountType, initialDeposit)
-                            // to a function that will create the account in the backend or database.
-
-                            // Navigating to the HomeScreen (example)
-                            navigator.replaceAll(HomeScreen(""))
+                            viewModel.crateAccount(navigator)
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(
@@ -136,4 +156,5 @@ class CreateBankAccountScreen(private val userId: String) : Screen {
             }
         }
     }
+
 }

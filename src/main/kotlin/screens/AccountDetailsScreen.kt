@@ -3,11 +3,13 @@ package screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
@@ -16,25 +18,49 @@ import cafe.adriel.voyager.core.screen.Screen
 class AccountDetailsScreen : Screen {
     @Composable
     override fun Content() {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Text("Account Details", style = TextStyle(fontSize = 24.sp))
+        Scaffold {
+            Row(modifier = Modifier.padding(16.dp)) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
 
-            Spacer(Modifier.height(16.dp))
+                ) {
+                    Text(
+                        text = "Account Details",
+                        style = MaterialTheme.typography.h5
+                    )
 
-            // Account Information
-            Text("Name: John Doe", style = TextStyle(fontSize = 18.sp))
-            Text("Email: john.doe@example.com", style = TextStyle(fontSize = 18.sp))
-            Text("Phone: +123 456 7890", style = TextStyle(fontSize = 18.sp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(Modifier.height(16.dp))
+                    // Account Information
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("Name: John Doe", style = MaterialTheme.typography.body1,fontSize = 25.sp)
+                        Text("Email: john.doe@example.com", style = MaterialTheme.typography.body1,fontSize = 25.sp)
+                        Text("Phone: +123 456 7890", style = MaterialTheme.typography.body1,fontSize = 25.sp)
+                    }
 
-            // Linked Accounts/Cards
-            Text("Linked Accounts", style = TextStyle(fontSize = 20.sp))
-            LinkedAccountsList(accounts = listOf("Account 1", "Account 2"))
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Linked Accounts/Cards
+                    Text(
+                        text = "Linked Accounts",
+                        style = MaterialTheme.typography.h6
+                    )
+
+                    LinkedAccountsList(accounts = listOf("Account"))
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Balance Section
+                }
+                Row(
+                    modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Balance:", fontSize = 25.sp)
+                    Text("$1,000,000,000", fontSize = 25.sp)
+                }
+                Box(Modifier.weight(1f))
+            }
         }
     }
 }
@@ -58,7 +84,7 @@ fun LinkedAccountItem(account: String) {
     ) {
         Text(
             text = account,
-            style = TextStyle(fontSize = 16.sp, color = Color.Black)
+            style = MaterialTheme.typography.body2.copy(color = Color.Black)
         )
     }
 }

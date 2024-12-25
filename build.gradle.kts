@@ -62,9 +62,7 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "term_project_demo"
             packageVersion = "1.0.0"
-            linux {
-                iconFile.set(project.file("src/main/resources/icons/app_icon.png")) // Path to .png file
-            }
+
         }
     }
 }

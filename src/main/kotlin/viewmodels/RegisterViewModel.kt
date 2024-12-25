@@ -1,6 +1,8 @@
 package viewmodels
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cafe.adriel.voyager.navigator.Navigator
@@ -17,6 +19,7 @@ import screens.LoginScreen
 class RegisterViewModel : ViewModel() {
     var firstName = mutableStateOf("")
     var lastName = mutableStateOf("")
+    var passportId by mutableStateOf("")
     var dateOfBirth = mutableStateOf("")
     var address = mutableStateOf("")
     var email = mutableStateOf("")
@@ -36,6 +39,7 @@ class RegisterViewModel : ViewModel() {
                 val user = User(
                     firstName = firstName.value,
                     lastName = lastName.value,
+                    passportId = passportId,
                     dateOfBirth = dateOfBirth.value,
                     address = address.value,
                     email = email.value,
