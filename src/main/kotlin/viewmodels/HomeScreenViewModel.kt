@@ -34,6 +34,8 @@ class HomeScreenViewModel(private val userId: String) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 getUserData()
+                delay(100)
+                //getRecentTransaction()
             } catch (e: Exception) {
                 println("Error in init block: $e")
             }
@@ -122,13 +124,10 @@ class HomeScreenViewModel(private val userId: String) : ViewModel() {
                 accountId = accounts?.get(0)?.accountId ?: 0
                 balance.value = accounts?.get(0)?.balance.toString()
 
-
-                //getRecentTransaction()
             }
         } catch (e: Exception) {
             println("Error at getting user data: $e")
         }
     }
-
 
 }

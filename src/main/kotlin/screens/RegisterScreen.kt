@@ -230,7 +230,6 @@ class RegisterScreen : Screen {
                         Button(
                             onClick = {
                                 viewModel.register(navigator)
-                                //navigator.replace(LoginScreen())
                             },
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = if (isFormValid) buttonColor else Color.Gray,
