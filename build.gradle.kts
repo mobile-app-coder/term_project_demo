@@ -45,6 +45,8 @@ dependencies {
     implementation("cafe.adriel.voyager:voyager-kodein:$voyagerVersion")
     implementation("org.jetbrains.compose.desktop:desktop-jvm:1.6.10")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3") // Use the latest version
+
 
     implementation("org.jetbrains.compose.material3:material3-desktop:1.2.1")
 
@@ -52,6 +54,8 @@ dependencies {
     //converter gson
     implementation("com.google.code.gson:gson:2.8.9")
     implementation(compose.materialIconsExtended)
+
+
 }
 
 compose.desktop {

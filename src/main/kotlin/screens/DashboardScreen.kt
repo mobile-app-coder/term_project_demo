@@ -5,8 +5,11 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowCircleLeft
+import androidx.compose.material.icons.filled.ArrowCircleRight
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
@@ -14,12 +17,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import screens.items.*
+import server.model.AccountTransfer
 import viewmodels.HomeScreenViewModel
 import java.time.LocalDate
 
@@ -151,15 +156,35 @@ class DashboardScreen(private val userId: String? = null) : Screen {
 
                     }
 
-                    Column(Modifier.weight(1f)) {
-                        Spacer(Modifier.height(16.dp))
-                        Text("Applications", fontSize = 20.sp, color = Color.Gray)
-                        Spacer(Modifier.height(16.dp))
-                        Column(Modifier.verticalScroll(rememberScrollState())) {
-                            for (i in 1..10) {
-                                ApplicationItem(
-                                    "Super Car:Ferrari F8", "Car loan", "Approved", LocalDate.now(), "$1 000 000"
-                                )
+                    Column(Modifier.weight(2f)) {
+                        Row {
+
+                            //application
+                            Column(modifier = Modifier.weight(1f)) {
+                                Spacer(Modifier.height(16.dp))
+                                Text("Applications", fontSize = 20.sp, color = Color.Gray)
+                                Spacer(Modifier.height(16.dp))
+                                Column(Modifier.verticalScroll(rememberScrollState())) {
+                                    for (i in 1..10) {
+                                        ApplicationItem(
+                                            "Super Car:Ferrari F8",
+                                            "Car loan",
+                                            "Approved",
+                                            LocalDate.now(),
+                                            "$1 000 000"
+                                        )
+                                    }
+                                }
+                            }
+
+                            Column(
+                                modifier = Modifier.weight(1f).padding(16.dp).verticalScroll(rememberScrollState())
+                            ) {
+                                Text("Recent transactions", fontSize = 20.sp, color = Color.Gray)
+                                for (i in 0..<viewModel.transfers.size) {
+                                    TransactionItem(viewModel.accountId, viewModel.transfers[i])
+
+                                }
                             }
                         }
                     }
@@ -187,6 +212,24 @@ class DashboardScreen(private val userId: String? = null) : Screen {
     }
 
     @Composable
+    fun TransactionItem(accountId: Int, accountTransfer: AccountTransfer) {
+        Box(modifier = Modifier.border(width = 1.dp, color = Color.Blue).fillMaxWidth().padding(vertical = 5.dp)) {
+            Row {
+                Text(accountId.toString())
+                Column {
+                    if (accountTransfer.senderAccountId == accountId) {
+                        Icon(imageVector = Icons.Default.ArrowCircleRight, contentDescription = "", tint = Color.Red)
+                    }
+                    if (accountTransfer.receiverAccountId == accountId) {
+                        Icon(imageVector = Icons.Default.ArrowCircleLeft, contentDescription = "", tint = Color.Green)
+                    }
+                }
+                Text(if (accountTransfer.senderAccountId == accountId) accountTransfer.receiverAccountId.toString() else accountTransfer.senderAccountId.toString())
+            }
+        }
+    }
+
+    @Composable
     fun Transaction(viewModel: HomeScreenViewModel) {
         Box(modifier = Modifier.fillMaxSize().padding(20.dp)) {
 
@@ -195,15 +238,15 @@ class DashboardScreen(private val userId: String? = null) : Screen {
 
                 OutlinedTextField(
                     value = viewModel.transferDestination,
-                    onValueChange = {
-                        viewModel.transferDestination = it
-                    },
+                    onValueChange = { viewModel.transferDestination = it },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     label = { Text("Enter account nmuber") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
                     value = viewModel.transferMoney,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     onValueChange = { viewModel.transferMoney = it },
                     label = { Text("Enter amount of money") },
                     modifier = Modifier.fillMaxWidth()
@@ -222,9 +265,15 @@ class DashboardScreen(private val userId: String? = null) : Screen {
                     label = { Text("Description") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                OutlinedButton(onClick = {
-                    viewModel.transfer()
-                }) {
+                OutlinedButton(
+                    onClick = {
+                        viewModel.transfer()
+
+                    }, enabled = viewModel.transferDestination.isNotEmpty() &&
+                            viewModel.transferMoney.isNotEmpty() &&
+                            viewModel.passportId.isNotEmpty() &&
+                            viewModel.transferDescription.isNotEmpty()
+                ) {
                     Text("Apply")
                 }
 
