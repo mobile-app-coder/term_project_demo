@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,16 +37,7 @@ class LoginScreen : Screen {
                 .background(backgroundColor),
             topBar = {
                 TopAppBar(
-                    title = { Text("Register", color = textColor) },
-                    navigationIcon = {
-                        IconButton(onClick = { navigator.pop() }) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "Back",
-                                tint = textColor
-                            )
-                        }
-                    },
+                    title = { Text("Login", color = textColor) },
                     backgroundColor = backgroundColor,
                     elevation = 0.dp
                 )
@@ -125,7 +114,8 @@ class LoginScreen : Screen {
                                 .fillMaxWidth()
                                 .height(50.dp),
                             onClick = {
-                                viewModel.login(navigator)
+                                //viewModel.login(navigator)
+                                navigator.replace(CreateBankAccountScreen("11"))
                             },
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = buttonColor,
@@ -146,10 +136,8 @@ class LoginScreen : Screen {
                         }
                     }
 
-
-                    TextButton(onClick = { /* Navigate to "Forgot Password" */ }) {
-                        Text("Forgot Password?", color = buttonColor)
-
+                    TextButton(onClick = { navigator.replace(RegisterScreen()) }) {
+                        Text("Register", color = buttonColor)
                     }
                 }
             }

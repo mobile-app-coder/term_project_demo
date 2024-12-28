@@ -18,7 +18,7 @@ import server.model.AccountTransferGsonConverter
 
 
 class HomeScreenViewModel(private val userId: String) : ViewModel() {
-    var balance = mutableStateOf("")
+    var balance = mutableStateOf("19 012")
 
     val searchText = mutableStateOf("")
     var accountId = 0
@@ -34,7 +34,6 @@ class HomeScreenViewModel(private val userId: String) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 getUserData()
-                delay(100)
                 //getRecentTransaction()
             } catch (e: Exception) {
                 println("Error in init block: $e")
@@ -68,9 +67,6 @@ class HomeScreenViewModel(private val userId: String) : ViewModel() {
                 val response = Network.getMessage()
                 if (response != null) {
                     if (response.startsWith("ok")) {
-                        delay(200)
-                        getUserData()
-                        delay(200)
                         getRecentTransaction()
                         transferDestination = ""
                         transferDescription = ""
@@ -79,6 +75,7 @@ class HomeScreenViewModel(private val userId: String) : ViewModel() {
                     }
                 }
             }
+
         } catch (e: Exception) {
             println(e)
         }
@@ -119,7 +116,6 @@ class HomeScreenViewModel(private val userId: String) : ViewModel() {
                 val params = response.split("|")
                 val user = UserGsonConverter.fromJson(params[1])
                 val accounts = AccountGsonConverter.fromJsonList(params[2])
-
 
                 accountId = accounts?.get(0)?.accountId ?: 0
                 balance.value = accounts?.get(0)?.balance.toString()

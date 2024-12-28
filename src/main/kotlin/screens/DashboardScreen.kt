@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -15,6 +16,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -26,11 +28,28 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import screens.items.*
 import server.model.AccountTransfer
 import viewmodels.HomeScreenViewModel
-import java.time.LocalDate
 
 
 // Dashboard Screen
 class DashboardScreen(private val userId: String? = null) : Screen {
+
+
+    val sampleData = listOf(
+        AccountTransfer(senderAccountId = 101, receiverAccountId = 202, amount = 150.50),
+        AccountTransfer(senderAccountId = 303, receiverAccountId = 404, amount = 250.75),
+        AccountTransfer(senderAccountId = 101, receiverAccountId = 303, amount = 100.00),
+        AccountTransfer(senderAccountId = 404, receiverAccountId = 101, amount = 300.20),
+        AccountTransfer(senderAccountId = 202, receiverAccountId = 404, amount = 500.00),
+        AccountTransfer(senderAccountId = 303, receiverAccountId = 101, amount = 75.25),
+        AccountTransfer(senderAccountId = 404, receiverAccountId = 202, amount = 50.00),
+        AccountTransfer(senderAccountId = 101, receiverAccountId = 404, amount = 250.60),
+        AccountTransfer(senderAccountId = 202, receiverAccountId = 303, amount = 125.30),
+        AccountTransfer(senderAccountId = 101, receiverAccountId = 202, amount = 200.80)
+    )
+
+
+
+
     @Composable
     @Preview
     override fun Content() {
@@ -159,31 +178,13 @@ class DashboardScreen(private val userId: String? = null) : Screen {
                     Column(Modifier.weight(2f)) {
                         Row {
 
-                            //application
-                            Column(modifier = Modifier.weight(1f)) {
-                                Spacer(Modifier.height(16.dp))
-                                Text("Applications", fontSize = 20.sp, color = Color.Gray)
-                                Spacer(Modifier.height(16.dp))
-                                Column(Modifier.verticalScroll(rememberScrollState())) {
-                                    for (i in 1..10) {
-                                        ApplicationItem(
-                                            "Super Car:Ferrari F8",
-                                            "Car loan",
-                                            "Approved",
-                                            LocalDate.now(),
-                                            "$1 000 000"
-                                        )
-                                    }
-                                }
-                            }
-
+                            ApplicationList(modifier = Modifier.weight(1f).padding(20.dp))
                             Column(
                                 modifier = Modifier.weight(1f).padding(16.dp).verticalScroll(rememberScrollState())
                             ) {
                                 Text("Recent transactions", fontSize = 20.sp, color = Color.Gray)
-                                for (i in 0..<viewModel.transfers.size) {
-                                    TransactionItem(viewModel.accountId, viewModel.transfers[i])
-
+                                for (i in sampleData.indices - 1) {
+                                    TransactionItem(viewModel.accountId, sampleData[i])
                                 }
                             }
                         }
@@ -213,21 +214,45 @@ class DashboardScreen(private val userId: String? = null) : Screen {
 
     @Composable
     fun TransactionItem(accountId: Int, accountTransfer: AccountTransfer) {
-        Box(modifier = Modifier.border(width = 1.dp, color = Color.Blue).fillMaxWidth().padding(vertical = 5.dp)) {
-            Row {
-                Text(accountId.toString())
-                Column {
-                    if (accountTransfer.senderAccountId == accountId) {
-                        Icon(imageVector = Icons.Default.ArrowCircleRight, contentDescription = "", tint = Color.Red)
-                    }
-                    if (accountTransfer.receiverAccountId == accountId) {
-                        Icon(imageVector = Icons.Default.ArrowCircleLeft, contentDescription = "", tint = Color.Green)
-                    }
-                }
-                Text(if (accountTransfer.senderAccountId == accountId) accountTransfer.receiverAccountId.toString() else accountTransfer.senderAccountId.toString())
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(if (accountTransfer.senderAccountId == accountId) Color(0xFFFFEBEE) else Color(0xFFE8F5E9))
+                .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Icon(
+                imageVector = if (accountTransfer.senderAccountId == accountId)
+                    Icons.Default.ArrowCircleRight else Icons.Default.ArrowCircleLeft,
+                contentDescription = null,
+                tint = if (accountTransfer.senderAccountId == accountId) Color.Red else Color.Green,
+                modifier = Modifier.size(32.dp)
+            )
+            Spacer(Modifier.width(16.dp))
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = "From: ${accountTransfer.senderAccountId}",
+                    style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.onSurface)
+                )
+                Text(
+                    text = "To: ${accountTransfer.receiverAccountId}",
+                    style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.onSurface)
+                )
             }
+            Text(
+                text = "\$${String.format("%.2f", accountTransfer.amount)}",
+                style = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.primary)
+            )
         }
     }
+
 
     @Composable
     fun Transaction(viewModel: HomeScreenViewModel) {

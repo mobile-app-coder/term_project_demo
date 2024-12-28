@@ -56,6 +56,8 @@ fun SettingsPanel(onClose: () -> Unit) {
             }
         }
     }
+
+
 }
 
 
@@ -135,19 +137,72 @@ fun ApplicationItem(name: String, applicationType: String, status: String, date:
         modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
     ) {
         Column {
-            Text(name)
-            Text(moneyAmount)
-            Text(applicationType)
+            Text(name, style = MaterialTheme.typography.body1)
+            Text(moneyAmount, style = MaterialTheme.typography.body2)
+            Text(applicationType, style = MaterialTheme.typography.body2)
         }
-        Text(date.toString())
+        Text(date.toString(), style = MaterialTheme.typography.body2)
         Text(
-            status, color = Color.White, modifier = Modifier.size(width = 100.dp, height = 30.dp).background(
-                color = when (status) {
-                    "Approved" -> Color(0xff85c1e9)
-                    "Waiting" -> Color.Green
-                    else -> Color.Red
-                }
-            ).padding(all = 4.dp).align(alignment = Alignment.CenterVertically)
+            status,
+            color = Color.White,
+            modifier = Modifier
+                .size(width = 100.dp, height = 30.dp)
+                .background(
+                    color = when (status) {
+                        "Approved" -> Color(0xff85c1e9) // Light Blue
+                        "Waiting" -> Color.Green // Green for Waiting
+                        else -> Color.Red // Red for Rejected
+                    }
+                )
+                .padding(all = 4.dp)
+                .align(alignment = Alignment.CenterVertically),
+            style = MaterialTheme.typography.body2
         )
     }
 }
+
+@Composable
+fun ApplicationList(modifier: Modifier) {
+    val sampleApplications = listOf(
+        ApplicationData("John Doe", "Car Loan", "Approved", LocalDate.now().minusDays(1), "$50,000"),
+        ApplicationData("Jane Smith", "Home Loan", "Waiting", LocalDate.now().minusDays(2), "$250,000"),
+        ApplicationData("Emily Green", "Business Loan", "Rejected", LocalDate.now().minusDays(3), "$100,000"),
+        ApplicationData("Michael Brown", "Personal Loan", "Approved", LocalDate.now().minusDays(4), "$30,000"),
+        ApplicationData("Chris Johnson", "Student Loan", "Waiting", LocalDate.now().minusDays(5), "$20,000"),
+        ApplicationData("Sarah Lee", "Car Loan", "Approved", LocalDate.now().minusDays(6), "$40,000"),
+        ApplicationData("David Wilson", "Business Loan", "Rejected", LocalDate.now().minusDays(7), "$200,000"),
+        ApplicationData("Sophia Martinez", "Home Loan", "Waiting", LocalDate.now().minusDays(8), "$300,000"),
+        ApplicationData("Liam Harris", "Personal Loan", "Approved", LocalDate.now().minusDays(9), "$15,000"),
+        ApplicationData("Olivia Clark", "Car Loan", "Rejected", LocalDate.now().minusDays(10), "$25,000"),
+        ApplicationData("Daniel Lewis", "Student Loan", "Approved", LocalDate.now().minusDays(11), "$5,000"),
+        ApplicationData("Charlotte Walker", "Home Loan", "Waiting", LocalDate.now().minusDays(12), "$350,000"),
+        ApplicationData("Amelia Hall", "Car Loan", "Approved", LocalDate.now().minusDays(13), "$60,000"),
+        ApplicationData("Ethan Allen", "Business Loan", "Rejected", LocalDate.now().minusDays(14), "$150,000"),
+        ApplicationData("Mason Young", "Personal Loan", "Waiting", LocalDate.now().minusDays(15), "$10,000"),
+        ApplicationData("Isabella King", "Car Loan", "Approved", LocalDate.now().minusDays(16), "$45,000"),
+        ApplicationData("Alexander Scott", "Business Loan", "Rejected", LocalDate.now().minusDays(17), "$500,000"),
+        ApplicationData("Lucas Green", "Student Loan", "Waiting", LocalDate.now().minusDays(18), "$8,000"),
+        ApplicationData("Zoe Adams", "Home Loan", "Approved", LocalDate.now().minusDays(19), "$200,000")
+    )
+
+    Column(modifier = modifier) {
+        sampleApplications.forEach {
+            ApplicationItem(
+                name = it.name,
+                applicationType = it.applicationType,
+                status = it.status,
+                date = it.date,
+                moneyAmount = it.moneyAmount
+            )
+        }
+    }
+}
+
+data class ApplicationData(
+    val name: String,
+    val applicationType: String,
+    val status: String,
+    val date: LocalDate,
+    val moneyAmount: String
+)
+

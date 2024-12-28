@@ -7,6 +7,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import network.Network
+import screens.BranchScreen
 import screens.HomeScreen
 
 
@@ -16,7 +17,7 @@ fun main() {
             onCloseRequest = ::exitApplication, title = "OS BANKING",
             state = WindowState(WindowPlacement.Fullscreen)
         ) {
-            Navigator(HomeScreen("22"))
+            Navigator(HomeScreen("11"))
         }
         val coroutineScope = rememberCoroutineScope()
         coroutineScope.launch(Dispatchers.IO) {

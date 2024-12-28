@@ -15,7 +15,7 @@ import screens.HomeScreen
 
 
 class CreateAccountViewModel(private val userId: String) : ViewModel() {
-
+    var hasAccount by mutableStateOf(true)
     private var _types = mutableStateListOf<AccountType>()
     var types: SnapshotStateList<AccountType> = _types
 
